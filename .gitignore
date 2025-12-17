@@ -83,6 +83,11 @@ application-dev.properties
 *-local.yml
 *-dev.yml
 
+# JWT Keys (private/public keys should never be committed)
+jwt-keys/
+*.pem
+*.key
+
 # Logs
 logs/
 *.log.*

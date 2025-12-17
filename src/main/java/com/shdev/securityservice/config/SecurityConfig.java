@@ -3,9 +3,11 @@ package com.shdev.securityservice.config;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
@@ -30,14 +32,26 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         log.info("Configuring security filter chain");
         http
-            .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/api/health", "/actuator/health").permitAll()
-                .anyRequest().authenticated()
-            )
-            .httpBasic(Customizer.withDefaults());
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/api/health", "/actuator/health").permitAll()
+                        .requestMatchers("/oauth2/rest/**").permitAll()  // OAuth2 endpoints handle authentication manually
+                        .anyRequest().authenticated()
+                );
+        // Removed .httpBasic() - OAuth2 endpoints validate credentials manually in the controller
 
         log.info("Configuring security filter chain completed");
         return http.build();
+    }
+
+    /**
+     * Password encoder bean for BCrypt hashing.
+     *
+     * @return BCryptPasswordEncoder instance
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 }

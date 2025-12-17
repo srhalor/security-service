@@ -14,6 +14,32 @@ management:
     health:
       show-details: always
 
+security:
+  jwt:
+    issuer: https://localhost:8090/oauth2
+    audience:
+      - https://localhost:8090/oauth2
+      - DEV_TokenPOC_RS
+    expiration-seconds: 3600
+    private-key-path: ${user.home}/jwt-keys/private_key.pem
+    public-key-path: ${user.home}/jwt-keys/public_key.pem
+    version: "1.0"
+    identity-domain-name: DEV_JET_WebGateDomain
+
+oauth2:
+  clients:
+    # Example client configuration
+    # Password is BCrypt encoded 'jgak824fHdK39gs8ga'
+    - client-id: DEV_OMS_OIDMWebGateID
+      client-secret: $2a$10$G/wxCIVqytrtSd93ybLowukQUem3HQ2V.VGYKphVqqZRX1L2tv81i
+      allowed-scopes:
+        - DEV_TokenPOC_RS.sharedcomponents
+      identity-domain: DEV_JET_WebGateDomain
+
 logging:
   level:
     com.shdev.securityservice: INFO
+    com.shdev.security: DEBUG
+    org.springframework.security: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} [%X{requestId}] [%X{userIdToken}] [%X{userIdHeader}] [%X{client}] - %msg%n"
