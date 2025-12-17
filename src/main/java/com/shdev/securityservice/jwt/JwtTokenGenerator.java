@@ -36,10 +36,11 @@ public class JwtTokenGenerator {
      * @param clientId the client ID (subject and client claim)
      * @param scope    the scope
      * @param domain   the identity domain name
+     * @param roles    the user roles
      * @return JWT token string
      */
-    public String generateToken(String clientId, String scope, String domain) {
-        log.debug("Generating JWT token for client: {}, scope: {}, domain: {}", clientId, scope, domain);
+    public String generateToken(String clientId, String scope, String domain, List<String> roles) {
+        log.debug("Generating JWT token for client: {}, scope: {}, domain: {}, roles: {}", clientId, scope, domain, roles);
 
         if (privateKey == null) {
             privateKey = loadPrivateKey();
@@ -64,11 +65,12 @@ public class JwtTokenGenerator {
                 .claim("client", clientId)
                 .claim("scope", List.of(scope))
                 .claim("domain", domain)
+                .claim("roles", roles)  // Add roles to JWT claims
                 .claim("v", jwtProperties.getVersion())
                 .signWith(privateKey, Jwts.SIG.RS256)
                 .compact();
 
-        log.debug("JWT token generated successfully with JTI: {}", jti);
+        log.debug("JWT token generated successfully with JTI: {} and roles: {}", jti, roles);
         return token;
     }
 

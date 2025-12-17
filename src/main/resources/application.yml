@@ -35,6 +35,9 @@ oauth2:
       allowed-scopes:
         - DEV_TokenPOC_RS.sharedcomponents
       identity-domain: DEV_JET_WebGateDomain
+      roles:
+        - ADMIN
+        - USER
 
 logging:
   level:

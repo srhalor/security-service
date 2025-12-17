@@ -89,8 +89,15 @@ public class TokenController {
             throw new InvalidRequestException("Scope '" + scope + "' is not allowed for this client");
         }
 
-        TokenResponse response = tokenService.generateToken(clientId, scope, identityDomainName);
-        log.info("Token generated successfully for client: {}", clientId);
+        // Get roles from client configuration (default to empty list if not configured)
+        java.util.List<String> roles = clientConfig.get().getRoles();
+        if (roles == null || roles.isEmpty()) {
+            roles = java.util.List.of("USER");  // Default role if none configured
+            log.debug("No roles configured for client {}, using default: USER", clientId);
+        }
+
+        TokenResponse response = tokenService.generateToken(clientId, scope, identityDomainName, roles);
+        log.info("Token generated successfully for client: {} with roles: {}", clientId, roles);
         return response;
     }
 

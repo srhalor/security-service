@@ -33,12 +33,13 @@ public class TokenService {
      * @param clientId client identifier
      * @param scope    token scope
      * @param domain   identity domain name
+     * @param roles    user roles for this client
      * @return TokenResponse containing access token
      */
-    public TokenResponse generateToken(String clientId, String scope, String domain) {
-        log.info("Generating token for client: {}, domain: {}", clientId, domain);
+    public TokenResponse generateToken(String clientId, String scope, String domain, java.util.List<String> roles) {
+        log.info("Generating token for client: {}, domain: {}, roles: {}", clientId, domain, roles);
 
-        String token = jwtTokenGenerator.generateToken(clientId, scope, domain);
+        String token = jwtTokenGenerator.generateToken(clientId, scope, domain, roles);
 
         return TokenResponse.builder()
                 .accessToken(token)
@@ -61,6 +62,12 @@ public class TokenService {
         try {
             Map<String, Object> claims = jwtTokenValidator.validateToken(token);
 
+            // Extract roles and format as colon-separated string
+            java.util.List<String> roles = TypeConversionUtil.toStringList(claims.get("roles"));
+            String userRole = !roles.isEmpty()
+                    ? String.join(":", roles)
+                    : null;
+
             return TokenInfoResponse.builder()
                     .issuer(TypeConversionUtil.toString(claims.get("iss")))
                     .audience(TypeConversionUtil.toStringList(claims.get("aud")))
@@ -72,6 +79,7 @@ public class TokenService {
                     .scope(TypeConversionUtil.toStringList(claims.get("scope")))
                     .domain(TypeConversionUtil.toString(claims.get("domain")))
                     .version(TypeConversionUtil.toString(claims.get("v")))
+                    .userRole(userRole)
                     .build();
         } catch (JwtTokenValidator.TokenValidationException e) {
             log.warn("Token validation failed: {}", e.getMessage());

@@ -25,6 +25,7 @@ public class OAuth2ClientProperties {
         private String clientSecret;
         private List<String> allowedScopes = new ArrayList<>();
         private String identityDomain;
+        private List<String> roles = new ArrayList<>();  // User roles for this client
     }
 }
 

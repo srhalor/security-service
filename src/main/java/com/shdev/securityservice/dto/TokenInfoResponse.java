@@ -21,7 +21,8 @@ public record TokenInfoResponse(
         @JsonProperty("client") String client,
         @JsonProperty("scope") List<String> scope,
         @JsonProperty("domain") String domain,
-        @JsonProperty("v") String version
+        @JsonProperty("v") String version,
+        @JsonProperty("userRole") String userRole  // Roles in "ADMIN:USER" format
 ) {
 }
 
